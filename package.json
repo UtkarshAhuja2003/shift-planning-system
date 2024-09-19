@@ -1,0 +1,30 @@
+{
+  "name": "shift-planning-system",
+  "version": "1.0.0",
+  "description": "Shift Planning System",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env src/index.js",
+    "dev": "nodemon --env-file=.env src/index.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UtkarshAhuja2003/shift-planning-system.git"
+  },
+  "author": "UtkarshAhuja2003",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UtkarshAhuja2003/shift-planning-system/issues"
+  },
+  "homepage": "https://github.com/UtkarshAhuja2003/shift-planning-system#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "mongoose": "^8.6.3",
+    "nodemon": "^3.1.6",
+    "validator": "^13.12.0"
+  }
+}
