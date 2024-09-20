@@ -1,11 +1,42 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 import { comparePassword, hashPassword } from "../utils/password.js";
-import { UserRolesEnum } from "../constants.js";
+import { UserRolesEnum, WeekDaysEnum } from "../constants.js";
 
 const { Schema } = mongoose;
+
+const availibilitySchema = new Schema({
+    timezone: {
+        type: String,
+        required: [true, "Timezone is required"],
+        trim: true,
+        validate: {
+          validator: function (value) {
+            const validTimezones = Intl.supportedValuesOf('timeZone');
+            return validTimezones.includes(value);
+          },
+          message: "Invalid timezone"
+        }
+    },
+    schedule: [
+        {
+            dayOfWeek: {
+                type: String,
+                enum: WeekDaysEnum,
+                required: [true, "Day of the week is required"]
+            },
+            startTime: {
+                type: Date,
+                required: [true, "Start time is required"]
+            },
+            endTime: {
+                type: Date,
+                required: [true, "End time is required"]
+            }
+        }
+    ]
+});
 
 const userSchema = new Schema({
     name: {
@@ -38,10 +69,7 @@ const userSchema = new Schema({
         enum: UserRolesEnum,
         default: UserRolesEnum.EMPLOYEE
     },
-    timezone: {
-        type: String,
-        required: [true, "Timezone is required"],
-    },
+    availability: availibilitySchema,
     refreshToken: {
         type: String
     }

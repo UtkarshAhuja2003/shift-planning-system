@@ -6,7 +6,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { email, password, role, name, timezone } = req.body;
+  const { email, password, role, name } = req.body;
 
   const existedUser = await User.findOne({ email });
   if (existedUser) {
@@ -17,7 +17,6 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     name,
-    timezone,
     role: role || UserRolesEnum.EMPLOYEE,
   });
 

@@ -5,9 +5,6 @@ import jwt from "jsonwebtoken";
 
 /**
  * Middleware to verify JSON Web Token (JWT) from the Authorization header.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @param {Function} next - Express next middleware function.
  * @throws {ApiError} If the token is missing, invalid, or the user is not found.
  */
 export const verifyJWT = asyncHandler(async (req, res, next) => {
