@@ -31,8 +31,8 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
+        "User registered successfully",
         { user, accessToken, refreshToken },
-        "User registered successfully"
       )
     );
 });
@@ -62,8 +62,8 @@ const loginUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { user, accessToken, refreshToken },
-        "User logged in successfully"
+        "User logged in successfully",
+        { user, accessToken, refreshToken }
       )
     );
 });
@@ -71,7 +71,7 @@ const loginUser = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
       .status(200)
-      .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
+      .json(new ApiResponse(200, "Current user fetched successfully", req.user));
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -86,7 +86,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, "User logged out"));
+    .json(new ApiResponse(200, "User logged out", {}));
 });
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -136,8 +136,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       .json(
         new ApiResponse(
           200,
-          { accessToken, refreshToken: newRefreshToken },
-          "Access token refreshed"
+          "Access token refreshed",
+          { accessToken, refreshToken: newRefreshToken }
         )
       );
   } catch (error) {

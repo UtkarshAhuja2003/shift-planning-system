@@ -15,8 +15,8 @@ const getEmployeesAvailability = asyncHandler(async (req, res) => {
         .json(
         new ApiResponse(
             200,
+            "Availability fetched successfully",
             { availabilities: employeesAvailability },
-            "Availability fetched successfully"
         )
         );
 });

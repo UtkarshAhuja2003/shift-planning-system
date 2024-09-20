@@ -51,8 +51,8 @@ const updateEmployeeAvailability = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { user: updatedUser },
-        "Availability updated successfully"
+        "Availability updated successfully",
+        { user: updatedUser }
       )
     );
 });
