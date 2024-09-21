@@ -1,21 +1,19 @@
 import { WeekDaysEnum } from "../constants.js";
 import User from "../models/User.js";
+import Shift from "../models/Shift.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const updateEmployeeAvailability = asyncHandler(async (req, res) => {
   const user = req.user;
-  const { timezone, schedule } = req.body;
+  const { availability } = req.body;
 
-  if(!timezone) {
-    throw new ApiError(400, "Timezone is required");
-  }
-  if (!schedule || !Array.isArray(schedule) || schedule.length !== 7) {
-    throw new ApiError(400, "Schedule is required and must be an array of 7 days");
+  if (!availability || !Array.isArray(availability) || availability.length !== 7) {
+    throw new ApiError(400, "Availability is required and must be an array of 7 days");
   }
 
-  for(const day of schedule) {
+  for(const day of availability) {
     const { dayOfWeek, startTime, endTime } = day;
     if (!dayOfWeek || !Object.values(WeekDaysEnum).includes(dayOfWeek)) {
       throw new ApiError(400, "Invalid day of the week");
@@ -36,10 +34,7 @@ const updateEmployeeAvailability = asyncHandler(async (req, res) => {
   const updatedUser = await User.findOneAndUpdate(
     { _id: user._id },
     { 
-      availability: {
-          timezone, 
-          schedule 
-      } 
+      availability
     }
   );
   if(!updatedUser) {
@@ -47,7 +42,7 @@ const updateEmployeeAvailability = asyncHandler(async (req, res) => {
   }
 
   return res
-    .status(201)
+    .status(200)
     .json(
       new ApiResponse(
         200,
@@ -57,6 +52,53 @@ const updateEmployeeAvailability = asyncHandler(async (req, res) => {
     );
 });
 
+const getEmployeeShifts = asyncHandler(async (req, res) => {
+  const employeeId = req.user._id;
+
+  const employee = await User.findById(employeeId);
+  if (!employee) {
+    throw new ApiError(404, "Employee not found");
+  }
+  const employeeTimezone = employee.timezone;
+
+  const assignedShifts = await Shift.find({ employee: employeeId }).populate('admin');
+
+  const shiftsWithConvertedTimes = assignedShifts.map(shift => {
+    const adminTimezone = shift.timezone || 'UTC'; 
+
+    const startTimeAdminTZ = new Date(shift.startTime).toLocaleString('en-US', { timeZone: adminTimezone });
+    const endTimeAdminTZ = new Date(shift.endTime).toLocaleString('en-US', { timeZone: adminTimezone });
+    const dayOfWeekAdminTZ = new Date(shift.startTime).toLocaleDateString('en-US', { weekday: 'long', timeZone: adminTimezone });
+
+    const startTimeEmployeeTZ = new Date(shift.startTime).toLocaleString('en-US', { timeZone: employeeTimezone });
+    const endTimeEmployeeTZ = new Date(shift.endTime).toLocaleString('en-US', { timeZone: employeeTimezone });
+    const dayOfWeekEmployeeTZ = new Date(shift.startTime).toLocaleDateString('en-US', { weekday: 'long', timeZone: employeeTimezone });
+
+    return {
+      ...shift._doc,
+      adminTimezone: {
+        dayOfWeek: dayOfWeekAdminTZ,
+        startTime: startTimeAdminTZ,
+        endTime: endTimeAdminTZ
+      },
+      employeeTimezone: {
+        dayOfWeek: dayOfWeekEmployeeTZ,
+        startTime: startTimeEmployeeTZ,
+        endTime: endTimeEmployeeTZ
+      }
+    };
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, "Shifts fetched successfully", { shifts: shiftsWithConvertedTimes })
+    );
+});
+
+
+
 export {
-    updateEmployeeAvailability
+    updateEmployeeAvailability,
+    getEmployeeShifts
 };

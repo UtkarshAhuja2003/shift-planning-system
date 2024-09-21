@@ -6,7 +6,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { email, password, role, name } = req.body;
+  const { email, password, role, name, timezone } = req.body;
 
   const existedUser = await User.findOne({ email });
   if (existedUser) {
@@ -18,6 +18,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     name,
     role: role || UserRolesEnum.EMPLOYEE,
+    timezone,
   });
 
   await user.save();
@@ -128,16 +129,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Refresh token is expired or used");
     }
 
-    const { accessToken, refreshToken: newRefreshToken } =
-      await generateAccessAndRefreshTokens(user._id);
-
     return res
       .status(200)
       .json(
         new ApiResponse(
           200,
           "Access token refreshed",
-          { accessToken, refreshToken: newRefreshToken }
+          { accessToken, refreshToken }
         )
       );
   } catch (error) {

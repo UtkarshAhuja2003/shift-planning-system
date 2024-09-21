@@ -7,35 +7,19 @@ import { UserRolesEnum, WeekDaysEnum } from "../constants.js";
 const { Schema } = mongoose;
 
 const availibilitySchema = new Schema({
-    timezone: {
-        type: String,
-        required: [true, "Timezone is required"],
-        trim: true,
-        validate: {
-          validator: function (value) {
-            const validTimezones = Intl.supportedValuesOf('timeZone');
-            return validTimezones.includes(value);
-          },
-          message: "Invalid timezone"
-        }
-    },
-    schedule: [
-        {
             dayOfWeek: {
                 type: String,
                 enum: WeekDaysEnum,
                 required: [true, "Day of the week is required"]
             },
             startTime: {
-                type: Date,
+                type: String,
                 required: [true, "Start time is required"]
             },
             endTime: {
-                type: Date,
+                type: String,
                 required: [true, "End time is required"]
             }
-        }
-    ]
 });
 
 const userSchema = new Schema({
@@ -64,12 +48,23 @@ const userSchema = new Schema({
             message: "Password must contain one lowercase, uppercase, number, special character"
         }
     },
+    timezone: {
+        type: String,
+        required: [true, "Timezone is required"],
+        validate: {
+        validator: function (value) {
+            const validTimezones = Intl.supportedValuesOf("timeZone");
+            return validTimezones.includes(value);
+        },
+        message: "Invalid timezone"
+        }
+    },
     role: {
         type: String,
         enum: UserRolesEnum,
         default: UserRolesEnum.EMPLOYEE
     },
-    availability: availibilitySchema,
+    availability: [availibilitySchema],
     refreshToken: {
         type: String
     }
