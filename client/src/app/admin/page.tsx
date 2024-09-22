@@ -11,8 +11,8 @@ const ViewEmployeeAvailability = () => {
   const [selectedEmployee, setSelectedEmployee] = useState<string>('');
   const [availability, setAvailability] = useState<IAvailability[] | null>(null);
   const [dayOfWeek, setDayOfWeek] = useState<string>('');
-  const [shiftStartTime, setShiftStartTime] = useState<string>('');
-  const [shiftEndTime, setShiftEndTime] = useState<string>('');
+  const [shiftStartTime, setShiftStartTime] = useState<Date | null>(null);
+  const [shiftEndTime, setShiftEndTime] = useState<Date | null>(null);
   const [availableEmployees, setAvailableEmployees] = useState<IUser[]>([]);
   const [selectedShiftEmployee, setSelectedShiftEmployee] = useState<string>('');
 
@@ -47,6 +47,14 @@ const ViewEmployeeAvailability = () => {
     }
   };
 
+  const handleTimeChange = (timeString: string, setTime: React.Dispatch<React.SetStateAction<Date | null>>) => {
+    const [hours, minutes] = timeString.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours));
+    date.setMinutes(parseInt(minutes));
+    setTime(date);
+  };
+
   const handleCreateShift = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -57,8 +65,8 @@ const ViewEmployeeAvailability = () => {
 
     const shiftData: IShift = {
       dayOfWeek: dayOfWeek,
-      startTime: shiftStartTime,
-      endTime: shiftEndTime,
+      startTime: shiftStartTime?.toISOString() || '',
+      endTime: shiftEndTime?.toISOString() || '',
       employeeId: selectedShiftEmployee,
     };
 
@@ -66,8 +74,8 @@ const ViewEmployeeAvailability = () => {
     if (res.success) {
       alert('Shift created successfully');
       setDayOfWeek('');
-      setShiftStartTime('');
-      setShiftEndTime('');
+      setShiftStartTime(null);
+      setShiftEndTime(null);
       setSelectedShiftEmployee('');
     } else {
       alert('Failed to create shift');
@@ -89,7 +97,7 @@ const ViewEmployeeAvailability = () => {
       >
         <option value="">-- Select an Employee --</option>
         {employees && employees.map((employee) => (
-          <option key={employee.email} value={employee.name}>
+          <option key={employee._id} value={employee._id}>
             {employee.name}
           </option>
         ))}
@@ -102,7 +110,6 @@ const ViewEmployeeAvailability = () => {
             <thead>
               <tr>
                 <th className="border border-gray-300 p-2">Day</th>
-                <th className="border border-gray-300 p-2">Date</th>
                 <th className="border border-gray-300 p-2">Availability</th>
               </tr>
             </thead>
@@ -110,7 +117,7 @@ const ViewEmployeeAvailability = () => {
             {availability.map((day) => (
                   <tr key={day.dayOfWeek}>
                     <td className="border border-gray-300 p-2">{day.dayOfWeek}</td>
-                    <td className="border border-gray-300 p-2">{new Date().toLocaleDateString()}</td>
+                    <td className="border border-gray-300 p-2">{day.startTime} - {day.endTime}</td>
                   </tr>
                 ))
             }
@@ -120,23 +127,30 @@ const ViewEmployeeAvailability = () => {
           <h2 className="text-xl mb-2">Create Shift</h2>
           <form onSubmit={handleCreateShift} className="mb-4">
             <div className="mb-2">
-              <label htmlFor="date" className="block mb-1">Date:</label>
-              <input
-                type="text"
+              <label htmlFor="Day" className="block mb-1">Day:</label>
+              <select
                 id="dayOfWeek"
                 value={dayOfWeek}
                 onChange={(e) => setDayOfWeek(e.target.value)}
                 className="border p-2 w-full"
                 required
-              />
+              >
+                <option value="">-- Select a Day --</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+              </select>
             </div>
             <div className="mb-2">
               <label htmlFor="startTime" className="block mb-1">Start Time:</label>
               <input
                 type="time"
                 id="startTime"
-                value={shiftStartTime}
-                onChange={(e) => setShiftStartTime(e.target.value)}
+                onChange={(e) => handleTimeChange(e.target.value, setShiftStartTime)}
                 className="border p-2 w-full"
                 required
               />
@@ -146,8 +160,7 @@ const ViewEmployeeAvailability = () => {
               <input
                 type="time"
                 id="endTime"
-                value={shiftEndTime}
-                onChange={(e) => setShiftEndTime(e.target.value)}
+                onChange={(e) => handleTimeChange(e.target.value, setShiftEndTime)}
                 className="border p-2 w-full"
                 required
               />
@@ -162,13 +175,13 @@ const ViewEmployeeAvailability = () => {
                 required
               >
                 <option value="">-- Select an Employee --</option>
-                {/* {
+                {
                   employees && employees.map((employee) => (
-                    <option key={employee.email} value={employee.name}>
+                    <option key={employee._id} value={employee._id}>
                       {employee.name}
                     </option>
                   ))
-                } */}
+                }
               </select>
             </div>
             <button type="submit" className="bg-blue-500 text-white p-2">Create Shift</button>

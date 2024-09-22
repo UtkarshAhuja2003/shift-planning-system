@@ -21,7 +21,7 @@ const getEmployeeAvailability = async (employeeID: any): Promise<{success: boole
         }
     
         const res = await response.json();
-        const availability = res.availability;
+        const availability = res.data.availability.availability;
     
         return {
             success: true,
@@ -73,6 +73,7 @@ const getAllEmployees = async () => {
 const createShift = async (shift: IShift): Promise<{success: boolean, message: String, shift: IShift}> => {
     try {
         const accessToken = (await getAccessToken()).accessToken;
+        console.log(shift);
     
         const response = await fetch(`${API_URL}/admin/shifts`, {
           method: 'POST',

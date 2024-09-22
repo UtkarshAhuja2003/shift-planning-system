@@ -1,17 +1,16 @@
 export interface IShift {
-  _id: string;
-  date: string;
+  _id?: string;
   dayOfWeek: string;
   startTime: string;
   endTime: string;
-  employee: string;
-  admin?: string | null;
-  adminTimezone: {
+  employeeId: string;
+  adminId?: string | null;
+  adminTimezone?: {
     dayOfWeek: string;
     startTime: string;
     endTime: string;
   };
-  employeeTimezone: {
+  employeeTimezone?: {
     dayOfWeek: string;
     startTime: string;
     endTime: string;

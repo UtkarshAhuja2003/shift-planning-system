@@ -82,11 +82,9 @@ const createShift = asyncHandler(async (req, res) => {
     if (!employee) throw new ApiError(404, "Employee not found");
 
     const shift = new Shift({
-        date,
         dayOfWeek,
         startTime,
         endTime,
-        timezone,
         employee: employeeId,
         admin: adminId
     });

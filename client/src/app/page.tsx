@@ -27,6 +27,7 @@ const MainPage = () => {
     e.preventDefault();
     if (authMode === 'Login') {
       const res = await loginUser(userData);
+      userData.role = localStorage.getItem('role') as 'EMPLOYEE' | 'ADMIN';
       if (!res.success) {
         alert('Invalid credentials');
         console.error(res.message);

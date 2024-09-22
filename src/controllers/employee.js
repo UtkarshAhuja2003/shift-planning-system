@@ -66,14 +66,36 @@ const getEmployeeShifts = asyncHandler(async (req, res) => {
   const shiftsWithConvertedTimes = assignedShifts.map(shift => {
     const adminTimezone = shift.timezone || 'UTC'; 
 
-    const startTimeAdminTZ = new Date(shift.startTime).toLocaleString('en-US', { timeZone: adminTimezone });
-    const endTimeAdminTZ = new Date(shift.endTime).toLocaleString('en-US', { timeZone: adminTimezone });
-    const dayOfWeekAdminTZ = new Date(shift.startTime).toLocaleDateString('en-US', { weekday: 'long', timeZone: adminTimezone });
-
-    const startTimeEmployeeTZ = new Date(shift.startTime).toLocaleString('en-US', { timeZone: employeeTimezone });
-    const endTimeEmployeeTZ = new Date(shift.endTime).toLocaleString('en-US', { timeZone: employeeTimezone });
-    const dayOfWeekEmployeeTZ = new Date(shift.startTime).toLocaleDateString('en-US', { weekday: 'long', timeZone: employeeTimezone });
-
+    const startTimeAdminTZ = new Date(shift.startTime).toLocaleTimeString('en-US', { 
+      timeZone: adminTimezone, 
+      hour: 'numeric', 
+      minute: 'numeric' 
+    });
+    const endTimeAdminTZ = new Date(shift.endTime).toLocaleTimeString('en-US', { 
+      timeZone: adminTimezone, 
+      hour: 'numeric', 
+      minute: 'numeric' 
+    });
+    const dayOfWeekAdminTZ = new Date(shift.startTime).toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      timeZone: adminTimezone 
+    });
+    
+    const startTimeEmployeeTZ = new Date(shift.startTime).toLocaleTimeString('en-US', { 
+      timeZone: employeeTimezone, 
+      hour: 'numeric', 
+      minute: 'numeric' 
+    });
+    const endTimeEmployeeTZ = new Date(shift.endTime).toLocaleTimeString('en-US', { 
+      timeZone: employeeTimezone, 
+      hour: 'numeric', 
+      minute: 'numeric' 
+    });
+    const dayOfWeekEmployeeTZ = new Date(shift.startTime).toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      timeZone: employeeTimezone 
+    });
+    
     return {
       ...shift._doc,
       adminTimezone: {

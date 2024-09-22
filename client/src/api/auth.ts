@@ -21,6 +21,7 @@ const loginUser = async (user: IUser): Promise<{ success: boolean; message?: str
       Cookies.set('accessToken', res.data.accessToken, { expires: 0.0104 }); // 15 minutes
       Cookies.set('refreshToken', res.data.refreshToken);
 
+      localStorage.setItem('role', res.data.user.role);
       localStorage.setItem('timezone', res.data.user.timezone);
 
       return {
@@ -54,6 +55,7 @@ const registerUser = async (user: IUser): Promise<{ success: boolean; message?: 
       Cookies.set('accessToken', res.data.accessToken, { expires: 0.0104 }); // 15 minutes
       Cookies.set('refreshToken', res.data.refreshToken); 
 
+      localStorage.setItem('role', res.data.user.role);
       localStorage.setItem('timezone', res.data.user.timezone);
   
       return {
@@ -91,8 +93,8 @@ const getAccessToken = async (): Promise<{accessToken: String}> => {
       }
 
       const res = await response.json();
-      accessToken = res.accessToken;
-      refreshToken = res.refreshToken;
+      accessToken = res.data.accessToken;
+      refreshToken = res.data.refreshToken;
       
       if (accessToken) {
         Cookies.set('accessToken', accessToken, { expires: 0.0104 });

@@ -56,14 +56,14 @@ const EmployeeShiftsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {shifts.map((shift) => (
+            {shifts && shifts.map((shift) => (
               <tr key={shift._id}>
                 <td className="border border-gray-400 p-2">{shift.dayOfWeek}</td>
                 <td className="border border-gray-400 p-2">
-                  {`${shift.employeeTimezone.startTime} - ${shift.employeeTimezone.endTime}`}
+                  {`${shift.employeeTimezone?.startTime ?? 'N/A'} - ${shift.employeeTimezone?.endTime ?? 'N/A'}`}
                 </td>
                 <td className="border border-gray-400 p-2">
-                  {`${shift.adminTimezone.startTime} - ${shift.adminTimezone.endTime}`}
+                  {shift.adminTimezone ? `${shift.adminTimezone.startTime} - ${shift.adminTimezone.endTime}` : 'N/A'}
                 </td>
               </tr>
             ))}
