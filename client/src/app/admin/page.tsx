@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { getEmployeeAvailability, getAllEmployees, createShift } from '@/api/admin';
+import { getEmployeeShifts } from '@/api/employee';
 import { IAvailability } from '@/interfaces/IAvailability';
 import { IShift } from '@/interfaces/IShift';
 import { IUser } from '@/interfaces/IUser';
@@ -13,8 +14,6 @@ const ViewEmployeeAvailability = () => {
   const [dayOfWeek, setDayOfWeek] = useState<string>('');
   const [shiftStartTime, setShiftStartTime] = useState<Date | null>(null);
   const [shiftEndTime, setShiftEndTime] = useState<Date | null>(null);
-  const [availableEmployees, setAvailableEmployees] = useState<IUser[]>([]);
-  const [selectedShiftEmployee, setSelectedShiftEmployee] = useState<string>('');
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -58,29 +57,59 @@ const ViewEmployeeAvailability = () => {
   const handleCreateShift = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!dayOfWeek || !shiftStartTime || !shiftEndTime || !selectedShiftEmployee) {
+    if (!dayOfWeek || !shiftStartTime || !shiftEndTime || !selectedEmployee) {
       alert('Please fill in all fields.');
       return;
     }
 
+    // Check if employee is available for the selected day
+    const selectedDayAvailability = availability?.find(a => a.dayOfWeek === dayOfWeek);
+    if (!selectedDayAvailability) {
+      alert('Employee is not available on the selected day.');
+      return;
+    }
+
+    // Helper function to convert "HH:MM" format to a Date object using the current date
+    const timeStringToDate = (timeString: string): Date => {
+      const [hours, minutes] = timeString.split(':').map(Number);
+      const date = new Date();
+      date.setHours(hours);
+      date.setMinutes(minutes);
+      date.setSeconds(0); // To avoid any second-based discrepancies
+      return date;
+    };
+
+    const employeeStartTime = timeStringToDate(selectedDayAvailability.startTime);
+    const employeeEndTime = timeStringToDate(selectedDayAvailability.endTime);
+
+    // Ensure shift times are within employee availability
+    if (shiftStartTime < employeeStartTime || shiftEndTime > employeeEndTime) {
+      alert('Shift times are outside employee\'s available hours.');
+      return;
+    }
+
+    // Create shift data
     const shiftData: IShift = {
       dayOfWeek: dayOfWeek,
       startTime: shiftStartTime?.toISOString() || '',
       endTime: shiftEndTime?.toISOString() || '',
-      employeeId: selectedShiftEmployee,
+      employeeId: selectedEmployee,
     };
 
+    // Create the shift
     const res = await createShift(shiftData);
     if (res.success) {
       alert('Shift created successfully');
       setDayOfWeek('');
       setShiftStartTime(null);
       setShiftEndTime(null);
-      setSelectedShiftEmployee('');
+      setSelectedEmployee('');
     } else {
       alert('Failed to create shift');
     }
-  };
+};
+
+
 
   return (
     <div className="p-4">
@@ -169,8 +198,8 @@ const ViewEmployeeAvailability = () => {
               <label htmlFor="shift-employee" className="block mb-1">Select Employee:</label>
               <select
                 id="shift-employee"
-                value={selectedShiftEmployee}
-                onChange={(e) => setSelectedShiftEmployee(e.target.value)}
+                value={selectedEmployee}
+                onChange={(e) => setSelectedEmployee(e.target.value)}
                 className="border p-2 w-full"
                 required
               >
